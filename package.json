@@ -1,14 +1,14 @@
 {
   "name": "@ostro/session",
   "version": "0.0.0-alpha.0",
-  "description": "Ostrojs http session module",
+  "description": "Session module for OstroJS",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@ostro/contracts": "^0.0.0-alpha.0",
-    "@ostro/cookie": "^0.0.0-alpha.0",
-    "@ostro/support": "^0.0.0-alpha.0",
+    "@ostro/contracts": "^0.0.0-alpha",
+    "@ostro/cookie": "^0.0.0-alpha",
+    "@ostro/support": "^0.0.0-alpha",
     "cookie": "^0.4.0",
     "cookie-signature": "^1.1.0",
     "fs-extra": "^8.1.0",
@@ -16,14 +16,18 @@
     "on-headers": "^1.0.2",
     "uid-safe": "^2.1.5"
   },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "engineStrict": true,
   "keywords": [
     "session",
     "nodejs http session",
-    "server session"
+    "cookie session"
   ],
   "author": "amar",
   "license": "MIT",
-  "main": "session.js",
+  "main": "sessionManager.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ostrojs/session.git"
@@ -31,8 +35,5 @@
   "bugs": {
     "url": "https://github.com/ostrojs/session/issues"
   },
-  "homepage": "https://github.com/ostrojs/session#readme",
-  "engines": {
-    "node": ">= 12.0"
-  }
+  "homepage": "https://github.com/ostrojs/session#readme"
 }
