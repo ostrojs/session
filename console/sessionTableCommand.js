@@ -2,14 +2,10 @@ const Command = require('@ostro/console/command')
 
 class SessionTableCommand extends Command {
 
-    get $signature() {
-        return 'session:table';
-    }
+    $signature = 'session:table';
 
-    get $description() {
-        return 'Create a migration for the session database table'
-    };
-    
+    $description = 'Create a migration for the session database table';
+
     $files;
 
     constructor($files) {
