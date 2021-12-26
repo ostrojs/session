@@ -3,9 +3,8 @@ const Migration = require('@ostro/database/migration')
 
 class CreateSessionsTable extends Migration {
 
-    up()
-    {
-        Schema.create('sessions', function ($table) {
+    async up() {
+        await Schema.create('sessions', function ($table) {
             $table.string('id').primary();
             $table.foreignId('user_id').nullable().index();
             $table.string('ip_address', 45).nullable();
@@ -15,9 +14,8 @@ class CreateSessionsTable extends Migration {
         });
     }
 
-    down()
-    {
-        Schema.dropIfExists('sessions');
+    async down() {
+        await Schema.dropIfExists('sessions');
     }
 }
 

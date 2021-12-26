@@ -1,4 +1,4 @@
-const { isPlainObject, merge, get, set, isObject, omit, uniq, difference, isArray } = require('lodash')
+const { isPlainObject, merge, get, set, isObject, omit, uniq, difference, isArray, intersection } = require('lodash')
 const SessionInterface = require('@ostro/contracts/session/session')
 const uid = require('uid-safe').sync
 const kAttributes = Symbol('attributes')
@@ -23,9 +23,15 @@ class Session extends SessionInterface {
             [kResponse]: {
                 value: response
             },
-            existed: { value: Boolean(__attributes) }
+            existed: {
+                value: Boolean(__attributes)
+            }
+
+        });
+        Object.defineProperty(this, 'touched', {
+            value: Boolean((this.get('__flash.__old')).length),
+            writable: true
         })
-        Object.defineProperty(this, 'touched', { value: Boolean((this.get('__flash.__old')).length), writable: true })
     }
 
     getId() {
@@ -132,8 +138,30 @@ class Session extends SessionInterface {
             };
         }
         this.put(key);
-        this.put('__flash.__new', (this.get('__flash.__new', [])).concat(Object.keys(key)));
+        this.put('__flash.__new', uniq(this.get('__flash.__new', []).concat(Object.keys(key))));
         this.put('__flash.__old', difference(this.get('__flash.__old', []), Object.keys(key)));
+    }
+
+    flashOnly(keys) {
+        keys = Array.isArray(keys) ? keys : arguments;
+        let onlyKeys = intersection(this.get('__flash.__new', []), keys)
+        let exceptKeys = difference(this.get('__flash.__new', []), keys)
+        for (let except of exceptKeys) {
+            this.forget(except)
+        }
+        this.put('__flash.__new', onlyKeys);
+        this.put('__flash.__old', difference(this.get('__flash.__old', []), keys));
+    }
+
+    flashExcept(keys) {
+        keys = Array.isArray(keys) ? keys : arguments;
+        let exceptKeys = intersection(this.get('__flash.__new', []), keys)
+        let onlyKeys = difference(this.get('__flash.__new', []), keys)
+        for (let except of exceptKeys) {
+            this.forget(except)
+        }
+        this.put('__flash.__new', onlyKeys);
+        this.put('__flash.__old', difference(this.get('__flash.__old', []), keys));
     }
 
     reflash() {
