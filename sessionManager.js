@@ -59,7 +59,7 @@ class SessionManager  extends Manager {
     }
 
     createDatabaseDriver($config) {
-        return this.adapt((new(require('./adapter/database'))(this.$container.database, $config['table'])))
+        return this.adapt((new(require('./adapter/database'))(this.$container.db, $config['table'])))
     }
 
     createCacheDriver($config, driver) {
