@@ -1,15 +1,14 @@
-const Schema = require('@ostro/database/schema')
+const Schema = require("@ostro/support/facades/schema");
 const Migration = require('@ostro/database/migration')
 
 class CreateSessionsTable extends Migration {
 
     async up() {
         await Schema.create('sessions', function ($table) {
-            $table.string('id').primary();
-            $table.foreignId('user_id').nullable().index();
+            $table.string('sid').primary();
             $table.string('ip_address', 45).nullable();
             $table.text('user_agent').nullable();
-            $table.text('payload');
+            $table.text('payload').nullable();
             $table.integer('last_activity').index();
         });
     }
