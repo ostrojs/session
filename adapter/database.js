@@ -10,7 +10,7 @@ class Database {
     }
 
     read(sid, cb) {
-        this[kConnection].table(this[kTable]).where({ sid }).value('data').then(res => {
+        this[kConnection].table(this[kTable]).where({ sid }).value('payload').then(res => {
             cb(null, (res ? JSON.parse(res) : {}))
         }).catch(err => {
             cb(err, null)
@@ -18,7 +18,7 @@ class Database {
     }
 
     write(sid, data, cb) {
-        this[kConnection].table(this[kTable]).updateOrInsert({ sid }, { data: JSON.stringify(data) }).then(res => {
+        this[kConnection].table(this[kTable]).updateOrInsert({ sid }, { payload: JSON.stringify(data) }).then(res => {
             cb(null, res)
         }).catch(function(err) {
             cb(err, null)
