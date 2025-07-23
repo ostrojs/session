@@ -48,7 +48,7 @@ class CookieSession {
     generateSidToCookie(response, val = uid(30)) {
         response.append('Set-Cookie', this[kCookie].createCookies(this[kConfig]['cookie'], String(val), {
             signed: true
-        }, response.req.secure()));
+        }, response.request.secure()));
     }
 
     structureobject() {
