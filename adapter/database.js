@@ -18,7 +18,7 @@ class Database {
     }
 
     write(sid, data, cb) {
-        this[kConnection].table(this[kTable]).updateOrInsert({ sid }, { data: JSON.stringify(data) }).then(res => {
+        this[kConnection].table(this[kTable]).updateOrInsert({ sid }, { payload: JSON.stringify(data) }).then(res => {
             cb(null, res)
         }).catch(function(err) {
             cb(err, null)
