@@ -11,7 +11,7 @@ class Database {
 
     read(sid, cb) {
         this[kConnection].table(this[kTable]).where({ sid }).value('data').then(res => {
-            cb(null, (res ? JSON.parse(res) : {}))
+            cb(null, (res ? JSON.parse(res) : null))
         }).catch(err => {
             cb(err, null)
         })
