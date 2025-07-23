@@ -29,7 +29,7 @@ class Session extends SessionInterface {
 
         });
         Object.defineProperty(this, 'touched', {
-            value: Boolean((this.get('__flash.__old')).length),
+            value: Boolean((this.get('__flash.__old',[])).length),
             writable: true
         })
     }
