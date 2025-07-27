@@ -16,9 +16,11 @@ class SessionStarter {
     start(request, response, next) {
         let end = response.end
         let ended = false;
-        onHeaders(response, () => {
-            this[kHandler].generateSidToCookie(response, request.session.getId())
-        });
+        if (request.hasOwnProperty("session")){
+            onHeaders(response, () => {
+                this[kHandler].generateSidToCookie(response, request.session.getId())
+            });
+        }
         response.end = (...argument) => {
             if ([404, 500].includes(response.statusCode)) {
                 return end.apply(response, argument)
