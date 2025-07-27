@@ -1,6 +1,6 @@
 {
   "name": "@ostro/session",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Session module for OstroJS",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,7 +17,7 @@
     "uid-safe": "^2.1.5"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "engineStrict": true,
   "keywords": [
