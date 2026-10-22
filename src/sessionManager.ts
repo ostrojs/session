@@ -1,9 +1,9 @@
-import '@ostro/support/helpers';
 import SessionStarter from './sessionStarter';
 import InvalidCookieClassException from './invalidCookieClassException';
 import CookieSession from './cookieSession';
 import SessionStore from './sessionStore';
 import Manager from '@ostro/support/manager';
+import { ucfirst } from '@ostro/support/string';
 import MemoryAdapter from './adapter/memory';
 import FileAdapter from './adapter/file';
 import DatabaseAdapter from './adapter/database';
@@ -66,7 +66,7 @@ class SessionManager extends Manager {
             return this.callCustomCreator(config, name);
         }
         const driverName = this.getDriverName().split('.');
-        const driverMethod = 'create' + (driverName[0] as any).ucfirst() + 'Driver';
+        const driverMethod = 'create' + ucfirst(driverName[0]) + 'Driver';
         if (driverMethod in this) {
             return (this as any)[driverMethod](config, driverName);
         } else {
