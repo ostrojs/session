@@ -1,6 +1,7 @@
+import { describe, test, expect, beforeEach, afterEach } from "@jest/globals";
 const fs = require('fs-extra');
-const path = require('path');
-const os = require('os');
+const path = require('node:path');
+const os = require('node:os');
 const _FileAdapter = require('../src/adapter/file');
 const FileAdapter = _FileAdapter.default || _FileAdapter;
 

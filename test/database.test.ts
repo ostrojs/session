@@ -1,3 +1,4 @@
+import { describe, test, expect, jest } from "@jest/globals";
 const _DatabaseAdapter = require('../src/adapter/database');
 const DatabaseAdapter = _DatabaseAdapter.default || _DatabaseAdapter;
 

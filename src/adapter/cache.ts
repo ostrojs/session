@@ -1,12 +1,9 @@
-const kConnection: unique symbol = Symbol('connection');
-const kMaxAge: unique symbol = Symbol('maxAge');
-
 /**
  * Class Cache session storage adapter.
  */
 class Cache {
-    [kConnection]: any;
-    [kMaxAge]: number | undefined;
+    #connection: any;
+    #maxAge: number | undefined;
 
     /**
      * Create a new instance.
@@ -15,9 +12,9 @@ class Cache {
      * @param $config - Session configuration dictionary.
      */
     constructor(connection: any, $config: Record<string, any>) {
-        this[kConnection] = connection;
+        this.#connection = connection;
         const driverOptions: any = $config.stores[$config['driver'].split('.')[0]];
-        this[kMaxAge] = typeof driverOptions === 'object' ? driverOptions.checkPeriod : undefined;
+        this.#maxAge = typeof driverOptions === 'object' ? driverOptions.checkPeriod : undefined;
     }
 
     /**
@@ -27,7 +24,7 @@ class Cache {
      * @param cb - Callback receiving error or data.
      */
     read(sid: string, cb: (err: any, data?: any) => void): void {
-        this[kConnection].get('session.' + sid).then((res: any) => {
+        this.#connection.get('session.' + sid).then((res: any) => {
             cb(null, JSON.parse(res));
         }).catch((err: any) => {
             cb(err, null);
@@ -42,7 +39,7 @@ class Cache {
      * @param cb - Callback receiving error or result.
      */
     write(sid: string, data: Record<string, any>, cb: (err: any, res?: any) => void): void {
-        this[kConnection].put('session.' + sid, JSON.stringify(data), this[kMaxAge]).then((res: any) => {
+        this.#connection.put('session.' + sid, JSON.stringify(data), this.#maxAge).then((res: any) => {
             cb(null, res);
         }).catch(function (err: any) {
             cb(err, null);
@@ -56,7 +53,7 @@ class Cache {
      * @param cb - Callback receiving error or success boolean.
      */
     destroy(sid: string, cb: (err: any, success?: boolean) => void): void {
-        this[kConnection].forget('session.' + sid).then((res: any) => {
+        this.#connection.forget('session.' + sid).then((res: any) => {
             cb(null, true);
         }).catch((err: any) => {
             cb(err, false);

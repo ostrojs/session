@@ -2,18 +2,13 @@ import onHeaders from 'on-headers';
 import SessionStoreException from './sessionStoreException';
 import { random } from 'lodash';
 
-const kStore: unique symbol = Symbol('store');
-const kHandler: unique symbol = Symbol('handler');
-const kConfig: unique symbol = Symbol('config');
-const kCloseSession: unique symbol = Symbol('closeSession');
-
 /**
  * Class SessionStarter orchestrating session start, response cookie writing, and auto-save.
  */
 class SessionStarter {
-    [kConfig]: Record<string, any>;
-    [kHandler]: any;
-    [kStore]: any;
+    #config: Record<string, any>;
+    #handler: any;
+    #store: any;
 
     /**
      * Create a new SessionStarter instance.
@@ -23,9 +18,9 @@ class SessionStarter {
      * @param store - Session storage instance.
      */
     constructor(config: Record<string, any>, handler: any, store: any) {
-        this[kConfig] = config;
-        this[kHandler] = handler;
-        this[kStore] = store;
+        this.#config = config;
+        this.#handler = handler;
+        this.#store = store;
     }
 
     /**
@@ -40,7 +35,7 @@ class SessionStarter {
         let ended: boolean = false;
         onHeaders(response, () => {
             if (Object.prototype.hasOwnProperty.call(request, 'session')) {
-                this[kHandler].generateSidToCookie(response, request.session.getId());
+                this.#handler.generateSidToCookie(response, request.session.getId());
             }
         });
 
@@ -52,14 +47,14 @@ class SessionStarter {
                 return;
             }
             ended = true;
-            this[kCloseSession](request, response, (err: any) => {
+            this.#closeSession(request, response, (err: any) => {
                 if (err) {
                     return next(new SessionStoreException(err));
                 }
                 end.apply(response, argument);
             });
         };
-        this[kHandler].start(request, response, next);
+        this.#handler.start(request, response, next);
     }
 
     /**
@@ -69,8 +64,8 @@ class SessionStarter {
      * @param response - HTTP response.
      * @param callback - Completion callback.
      */
-    [kCloseSession](request: any, response: any, callback: (err?: any) => void): void {
-        if (request.session.touched === true || (this[kConfig]['resave'] === true && request.session.existed === true) || (request.session.existed === false && this[kConfig]['saveUninitialized'] === true)) {
+    #closeSession(request: any, response: any, callback: (err?: any) => void): void {
+        if (request.session.touched === true || (this.#config['resave'] === true && request.session.existed === true) || (request.session.existed === false && this.#config['saveUninitialized'] === true)) {
             request.session.save(callback);
         } else {
             callback(null);
@@ -83,9 +78,9 @@ class SessionStarter {
      */
     public collectGarbage(): void {
         if (this.configHitsLottery()) {
-            const period: number = parseInt(this[kConfig]['lifetime']) + 1;
-            if (typeof this[kStore]['destroyExpireSession'] === 'function') {
-                this[kStore].destroyExpireSession(period);
+            const period: number = parseInt(this.#config['lifetime']) + 1;
+            if (typeof this.#store['destroyExpireSession'] === 'function') {
+                this.#store.destroyExpireSession(period);
             }
         }
     }
@@ -96,7 +91,7 @@ class SessionStarter {
      * @returns True if lottery succeeds.
      */
     public configHitsLottery(): boolean {
-        return (random(1, this[kConfig]['lottery'][1]) <= this[kConfig]['lottery'][0]);
+        return (random(1, this.#config['lottery'][1]) <= this.#config['lottery'][0]);
     }
 }
 

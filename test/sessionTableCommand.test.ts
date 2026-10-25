@@ -1,4 +1,5 @@
-const path = require('path');
+import { describe, test, expect, jest } from "@jest/globals";
+const path = require('node:path');
 const _SessionTableCommand = require('../src/console/sessionTableCommand');
 const SessionTableCommand = _SessionTableCommand.default || _SessionTableCommand;
 
@@ -10,6 +11,8 @@ describe('console/sessionTableCommand', () => {
         };
 
         const command = new SessionTableCommand(mockFiles);
+        expect(command.$signature).toBe('session:table');
+        expect(command.$description).toBe('Create a migration for the session database table');
         command.info = jest.fn();
 
         const mockApp = {
@@ -30,5 +33,28 @@ describe('console/sessionTableCommand', () => {
             'MIGRATION_STUB_CONTENT'
         );
         expect(command.info).toHaveBeenCalledWith('Migration created successfully!');
+    });
+
+    test('creates migration file from ts stub when path ends with .ts', async () => {
+        const mockFiles = {
+            put: jest.fn().mockResolvedValue(true),
+            get: jest.fn().mockResolvedValue('TS_STUB_CONTENT')
+        };
+        const command = new SessionTableCommand(mockFiles);
+        command.info = jest.fn();
+        command.$app = {
+            databasePath: jest.fn((sub) => '/project/database/' + sub),
+            'migration.creator': {
+                create: jest.fn().mockResolvedValue('/project/database/migrations/2026_01_01_000000_create_sessions_table.ts')
+            }
+        };
+
+        await command.handle();
+
+        expect(mockFiles.get).toHaveBeenCalledWith(path.resolve(__dirname, '../src/console/stubs/database.ts.stub'));
+        expect(mockFiles.put).toHaveBeenCalledWith(
+            '/project/database/migrations/2026_01_01_000000_create_sessions_table.ts',
+            'TS_STUB_CONTENT'
+        );
     });
 });

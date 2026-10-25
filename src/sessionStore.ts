@@ -1,10 +1,8 @@
-const kStore: unique symbol = Symbol('store');
-
 /**
  * Class SessionStore.
  */
 class SessionStore {
-    [kStore]: any;
+    #store: any;
 
     /**
      * Create a new instance.
@@ -12,7 +10,7 @@ class SessionStore {
      * @param $store - Underlying session storage adapter.
      */
     constructor($store: any) {
-        this[kStore] = $store;
+        this.#store = $store;
     }
 
     /**
@@ -22,7 +20,7 @@ class SessionStore {
      * @param cb - Callback receiving error and data.
      */
     read(sid: string = '', cb: (err: any, data?: any) => void): void {
-        this[kStore].read(sid, cb);
+        this.#store.read(sid, cb);
     }
 
     /**
@@ -33,7 +31,7 @@ class SessionStore {
      * @param cb - Completion callback.
      */
     write(sid: string = '', data: Record<string, any>, cb: (err?: any) => void): void {
-        this[kStore].write(sid, data, cb);
+        this.#store.write(sid, data, cb);
     }
 
     /**
@@ -43,7 +41,7 @@ class SessionStore {
      * @param cb - Completion callback.
      */
     destroy(sid: string = '', cb: (err?: any) => void): void {
-        this[kStore].destroy(sid, cb);
+        this.#store.destroy(sid, cb);
     }
 
     /**
@@ -52,7 +50,7 @@ class SessionStore {
      * @param maxAge - Maximum session age in minutes.
      */
     public destroyExpireSession(maxAge: number): void {
-        this[kStore].destroyExpireSession(maxAge);
+        this.#store.destroyExpireSession(maxAge);
     }
 }
 
