@@ -1,4 +1,5 @@
-const path = require('path');
+import { describe, test, expect, jest } from "@jest/globals";
+const path = require('node:path');
 const _SessionTableCommand = require('../src/console/sessionTableCommand');
 const SessionTableCommand = _SessionTableCommand.default || _SessionTableCommand;
 

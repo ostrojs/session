@@ -1,9 +1,9 @@
 import Jar from '@ostro/cookie/jar';
 import Session from './session';
 import * as uidSafeModule from 'uid-safe';
-const uidSafe: any = (uidSafeModule as any).default || uidSafeModule;
+const uidSafe: any = (uidSafeModule as { default?: unknown }).default || uidSafeModule;
 import * as csrfModule from 'csrf';
-const csrfConstructor: any = (csrfModule as any).default || csrfModule;
+const csrfConstructor: any = (csrfModule as { default?: unknown }).default || csrfModule;
 import Cookie from '@ostro/cookie/cookie';
 
 const uid = uidSafe.sync;
@@ -11,18 +11,13 @@ const tokens = new csrfConstructor({
     saltLength: 30
 });
 
-const kConfig: unique symbol = Symbol('config');
-const kStore: unique symbol = Symbol('store');
-const kGetSessionId: unique symbol = Symbol('getSessionId');
-const kCookie: unique symbol = Symbol('cookie');
-
 /**
  * Class CookieSession handling session cookie lifecycle and request binding.
  */
 class CookieSession {
-    [kStore]: any;
-    [kConfig]: Record<string, any>;
-    [kCookie]: any;
+    #store: any;
+    #config: Record<string, any>;
+    #cookie: any;
 
     /**
      * Create a new CookieSession instance.
@@ -32,9 +27,18 @@ class CookieSession {
      * @param $store - Session store instance.
      */
     constructor($app: any, $config: Record<string, any>, $store: any) {
-        this[kStore] = $store;
-        this[kConfig] = $config;
-        this[kCookie] = new Jar($app, $config);
+        this.#store = $store;
+        this.#config = $config;
+        this.#cookie = new Jar($app, $config);
+    }
+
+    /**
+     * Get the underlying cookie jar (exposed for testing/integration).
+     *
+     * @returns Cookie Jar instance.
+     */
+    public getCookieJar(): any {
+        return this.#cookie;
     }
 
     /**
@@ -50,13 +54,13 @@ class CookieSession {
         if (request.cookie instanceof Cookie) {
             cookies = request.cookie.all();
         } else {
-            cookies = this[kCookie].getCookies(headerCookies);
+            cookies = this.#cookie.getCookies(headerCookies);
         }
         if (cookies) {
-            cookies = this[kCookie].getSignedCookies(cookies, this[kConfig]['key']);
+            cookies = this.#cookie.getSignedCookies(cookies, this.#config['key']);
         }
-        const sid: string = this[kGetSessionId]((cookies || {})[this[kConfig]['cookie']]);
-        this[kStore].read(sid, (err: any, data: any) => {
+        const sid: string = this.#getSessionId((cookies || {})[this.#config['cookie']]);
+        this.#store.read(sid, (err: any, data: any) => {
             Object.defineProperty(request, 'session', {
                 value: new Session(this, data, sid, response),
                 enumerable: true
@@ -71,7 +75,7 @@ class CookieSession {
      * @param id - Candidate session ID.
      * @returns Validated session ID.
      */
-    [kGetSessionId](id?: any): string {
+    #getSessionId(id?: any): string {
         if (!(typeof id === 'string' && /^[A-Za-z0-9-_]/.test(id))) {
             id = uid(30);
         }
@@ -85,7 +89,7 @@ class CookieSession {
      * @param val - Session ID value.
      */
     generateSidToCookie(response: any, val: string = uid(30)): void {
-        response.append('Set-Cookie', this[kCookie].createCookies(this[kConfig]['cookie'], String(val), {
+        response.append('Set-Cookie', this.#cookie.createCookies(this.#config['cookie'], String(val), {
             signed: true
         }, response.request.secure()));
     }
@@ -97,7 +101,7 @@ class CookieSession {
      */
     public structureobject(): { __token: string; __flash: { __old: string[]; __new: string[] } } {
         return {
-            __token: tokens.create(this[kConfig]['key']),
+            __token: tokens.create(this.#config['key']),
             __flash: {
                 "__old": [],
                 "__new": []
@@ -113,7 +117,7 @@ class CookieSession {
      * @param cb - Completion callback.
      */
     write(sessionId: string, __attributes: any, cb?: (err: any, data?: any) => void): void {
-        this[kStore].write(sessionId, __attributes, cb);
+        this.#store.write(sessionId, __attributes, cb);
     }
 
     /**
@@ -123,7 +127,7 @@ class CookieSession {
      * @param cb - Completion callback.
      */
     destroy(sessionId: string, cb?: (err: any) => void): void {
-        this[kStore].destroy(sessionId, cb);
+        this.#store.destroy(sessionId, cb);
     }
 }
 

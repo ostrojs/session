@@ -2,19 +2,11 @@ import type { ISession } from '@ostro/contracts/session/session';
 import SessionInterface from '@ostro/contracts/session/session';
 import { isPlainObject, merge, get, set, isObject, omit, uniq, difference, isArray, intersection } from 'lodash';
 
-const kAttributes: unique symbol = Symbol('attributes');
-const kSessionId: unique symbol = Symbol('sessionid');
-const kResponse: unique symbol = Symbol('response');
-const kHandler: unique symbol = Symbol('handler');
-
-/**
- * Class Session representing an active HTTP session instance.
- */
 class Session extends SessionInterface implements ISession {
-    [kSessionId]: string;
-    [kHandler]: any;
-    [kAttributes]: Record<string, any>;
-    [kResponse]: any;
+    #sessionId: string;
+    #handler: any;
+    #attributes: Record<string, any>;
+    #response: any;
     public existed: boolean = false;
     public touched: boolean = false;
 
@@ -28,19 +20,11 @@ class Session extends SessionInterface implements ISession {
      */
     constructor(handler: any, __attributes: any, sessionId: string, response: any) {
         super();
-        this[kSessionId] = sessionId;
+        this.#sessionId = sessionId;
+        this.#handler = handler;
+        this.#attributes = __attributes || handler.structureobject();
+        this.#response = response;
         Object.defineProperties(this, {
-            [kHandler]: {
-                value: handler
-            },
-            [kAttributes]: {
-                value: __attributes || handler.structureobject(),
-                writable: true,
-                configurable: true
-            },
-            [kResponse]: {
-                value: response
-            },
             existed: {
                 value: Boolean(__attributes)
             }
@@ -57,7 +41,7 @@ class Session extends SessionInterface implements ISession {
      * @returns Current session ID.
      */
     public getId(): string {
-        return this[kSessionId];
+        return this.#sessionId;
     }
 
     /**
@@ -67,7 +51,7 @@ class Session extends SessionInterface implements ISession {
      */
     public flush(): boolean {
         this.touched = true;
-        this[kAttributes] = this[kHandler].structureobject();
+        this.#attributes = this.#handler.structureobject();
         return true;
     }
 
@@ -82,7 +66,7 @@ class Session extends SessionInterface implements ISession {
         });
         this.put('__flash.__old', this.get('__flash.__new', []));
         this.put('__flash.__new', []);
-        this[kHandler].write(this[kSessionId], this[kAttributes], (err: any, data: any) => {
+        this.#handler.write(this.#sessionId, this.#attributes, (err: any, data: any) => {
             callback(err, data);
         });
     }
@@ -96,9 +80,9 @@ class Session extends SessionInterface implements ISession {
      * @returns Pulled value or fallback.
      */
     public pull<T = unknown>(key: string, defaultValue?: T | null): T | null {
-        if (this[kAttributes][key]) {
-            defaultValue = this[kAttributes][key];
-            delete this[kAttributes][key];
+        if (this.#attributes[key]) {
+            defaultValue = this.#attributes[key];
+            delete this.#attributes[key];
             this.touched = true;
         }
         return defaultValue || null;
@@ -159,10 +143,10 @@ class Session extends SessionInterface implements ISession {
      */
     public regenerate(destroy: boolean, cb?: Function): void {
         if (destroy) {
-            this[kHandler].destroy(this[kSessionId], cb);
+            this.#handler.destroy(this.#sessionId, cb);
         }
         this.flush();
-        this[kHandler].generateSidToCookie(this[kResponse]);
+        this.#handler.generateSidToCookie(this.#response);
     }
 
     /**
@@ -172,7 +156,7 @@ class Session extends SessionInterface implements ISession {
      * @returns True if attribute exists.
      */
     public has(key: string): boolean {
-        return get(this[kAttributes], key) != undefined;
+        return get(this.#attributes, key) != undefined;
     }
 
     /**
@@ -182,7 +166,7 @@ class Session extends SessionInterface implements ISession {
      */
     public forget(key: string): void {
         this.touched = true;
-        delete this[kAttributes][key];
+        delete this.#attributes[key];
     }
 
     /**
@@ -194,7 +178,7 @@ class Session extends SessionInterface implements ISession {
      * @returns Attribute value or fallback.
      */
     get<T = unknown>(key: string, defaultValue?: T | null): T | null {
-        return get(this[kAttributes], key) || defaultValue || null;
+        return get(this.#attributes, key) || defaultValue || null;
     }
 
     /**
@@ -203,7 +187,7 @@ class Session extends SessionInterface implements ISession {
      * @returns Dictionary of all attributes.
      */
     public all(): Record<string, any> {
-        return omit(this[kAttributes], ['_token', 'flash']);
+        return omit(this.#attributes, ['_token', 'flash']);
     }
 
     /**
@@ -222,7 +206,7 @@ class Session extends SessionInterface implements ISession {
         const targetKey = key as Record<string, any>;
         for (const objKey in targetKey) {
             if (Object.prototype.hasOwnProperty.call(targetKey, objKey)) {
-                set(this[kAttributes], objKey, targetKey[objKey]);
+                set(this.#attributes, objKey, targetKey[objKey]);
                 this.touched = true;
             }
         }

@@ -1,3 +1,4 @@
+import { describe, test, it, expect, beforeEach, jest } from "@jest/globals";
 const _Memory = require('../src/adapter/memory');
 const Memory = _Memory.default || _Memory;
 

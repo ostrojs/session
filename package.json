@@ -1,31 +1,31 @@
 {
     "name": "@ostro/session",
-    "version": "2.0.0-alpha.9",
+    "version": "2.0.0-alpha.3",
     "description": "Session module for OstroJS",
     "scripts": {
-        "build": "npm run lint:check && npx tsc -p tsconfig.build.json && mkdir -p build/console/stubs && cp -r src/console/stubs/ build/console/stubs/ && node scripts/build.js",
+        "build": "npm run lint:check && rm -rf build && ostro-build --prepare",
         "prepublishOnly": "npm run build",
-        "test": "npx c8 npx jest",
+        "test": "jest",
         "clean": "rm -rf build coverage",
-        "lint:check": "tsc --noEmit -p tsconfig.build.json"
+        "lint:check": "tsc --noEmit"
     },
     "main": "sessionManager.js",
-    "types": ".types/sessionManager.d.ts",
+    "types": ".typed/sessionManager.d.ts",
     "exports": {
         ".": {
-            "types": "./.types/sessionManager.d.ts",
+            "types": "./.typed/sessionManager.d.ts",
             "default": "./sessionManager.js"
         },
         "./*": {
-            "types": "./.types/*.d.ts",
+            "types": "./.typed/*.d.ts",
             "default": "./*.js"
         }
     },
     "dependencies": {
-        "@ostro/console": "^2.0.0-alpha.10",
-        "@ostro/contracts": "^2.0.0-alpha.9",
-        "@ostro/cookie": "^2.0.0-alpha.8",
-        "@ostro/support": "^2.0.0-alpha.10",
+        "@ostro/console": "^2.0.0-alpha.3",
+        "@ostro/contracts": "^2.0.0-alpha.3",
+        "@ostro/cookie": "^2.0.0-alpha.3",
+        "@ostro/support": "^2.0.0-alpha.3",
         "cookie": "^0.7.2",
         "cookie-signature": "^1.2.2",
         "csrf": "^3.1.0",
@@ -55,7 +55,7 @@
     },
     "homepage": "https://github.com/ostrojs/session#readme",
     "devDependencies": {
-        "@ostro/builder": "^2.0.0-alpha.7",
+        "@ostro/builder": "^2.0.0-alpha.1",
         "@types/jest": "^30.0.0",
         "@types/node": "^22.0.0",
         "c8": "^10.1.3",
