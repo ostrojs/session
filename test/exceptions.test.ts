@@ -1,3 +1,4 @@
+import { describe, test, expect } from "@jest/globals";
 const _InvalidCookieClassException = require('../src/invalidCookieClassException');
 const InvalidCookieClassException = _InvalidCookieClassException.default || _InvalidCookieClassException;
 const _SessionStoreException = require('../src/sessionStoreException');

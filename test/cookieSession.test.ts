@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeEach, jest } from "@jest/globals";
 const _CookieSession = require('../src/cookieSession');
 const CookieSession = _CookieSession.default || _CookieSession;
 const _Cookie = require('@ostro/cookie/cookie');
@@ -128,8 +129,7 @@ describe('CookieSession', () => {
             }
         };
 
-        const kCookieSym = Object.getOwnPropertySymbols(cookieSession).find(s => s.description === 'cookie');
-        const jar = cookieSession[kCookieSym];
+        const jar = cookieSession.getCookieJar();
         const origGetCookies = jar.getCookies;
         jar.getCookies = () => null;
 

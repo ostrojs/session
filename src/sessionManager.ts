@@ -1,5 +1,4 @@
 import SessionStarter from './sessionStarter';
-import InvalidCookieClassException from './invalidCookieClassException';
 import CookieSession from './cookieSession';
 import SessionStore from './sessionStore';
 import Manager from '@ostro/support/manager';
@@ -68,7 +67,7 @@ class SessionManager extends Manager {
         const driverName = this.getDriverName().split('.');
         const driverMethod = 'create' + ucfirst(driverName[0]) + 'Driver';
         if (driverMethod in this) {
-            return (this as any)[driverMethod](config, driverName);
+            return ((this as Record<string, Function>)[driverMethod])(config, driverName);
         } else {
             throw new Error(`Driver [${this.getDriverName()}] is not supported.`);
         }

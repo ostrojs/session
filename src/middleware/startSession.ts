@@ -13,7 +13,7 @@ class startSession {
      * Create a new startSession middleware instance.
      */
     constructor() {
-        this.$session = (this as any).$app['session'];
+        this.$session = (this as { $app?: { session?: unknown } }).$app?.session;
         if (this.$session instanceof SessionManager) {
             this.$registered = true;
             this.startSession = this.$session.start();

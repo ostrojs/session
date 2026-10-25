@@ -1,9 +1,10 @@
+import { describe, test, expect, beforeEach, jest } from "@jest/globals";
 const _SessionManager = require('../src/sessionManager');
 const SessionManager = _SessionManager.default || _SessionManager;
 const _SessionStore = require('../src/sessionStore');
 const SessionStore = _SessionStore.default || _SessionStore;
-const path = require('path');
-const os = require('os');
+const path = require('node:path');
+const os = require('node:os');
 
 describe('SessionManager', () => {
     let mockApp;
