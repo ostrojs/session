@@ -1,9 +1,9 @@
 import Jar from '@ostro/cookie/jar';
 import Session from './session';
-import * as uidSafeModule from 'uid-safe';
-const uidSafe: any = (uidSafeModule as { default?: unknown }).default || uidSafeModule;
-import * as csrfModule from 'csrf';
-const csrfConstructor: any = (csrfModule as { default?: unknown }).default || csrfModule;
+import uidSafeModule from 'uid-safe';
+import csrfModule from 'csrf';
+const uidSafe: any = uidSafeModule;
+const csrfConstructor: any = csrfModule;
 import Cookie from '@ostro/cookie/cookie';
 
 const uid = uidSafe.sync;
