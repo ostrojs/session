@@ -18,6 +18,7 @@ class CookieSession {
     #store: any;
     #config: Record<string, any>;
     #cookie: any;
+    #app: any;
 
     /**
      * Create a new CookieSession instance.
@@ -27,6 +28,7 @@ class CookieSession {
      * @param $store - Session store instance.
      */
     constructor($app: any, $config: Record<string, any>, $store: any) {
+        this.#app = $app;
         this.#store = $store;
         this.#config = $config;
         this.#cookie = new Jar($app, $config);
@@ -55,11 +57,18 @@ class CookieSession {
             cookies = request.cookie.all();
         } else {
             cookies = this.#cookie.getCookies(headerCookies);
+            if (cookies) {
+                const secret = this.#config['key'] || this.#app?.['config']?.get?.('app.key') || this.#app?.['config']?.['app']?.['key'];
+                cookies = this.#cookie.getSignedCookies(cookies, secret);
+            }
         }
-        if (cookies) {
-            cookies = this.#cookie.getSignedCookies(cookies, this.#config['key']);
+        let rawSid = (cookies || {})[this.#config['cookie']];
+        if (typeof rawSid === 'string' && rawSid.startsWith('s:')) {
+            const secret = this.#config['key'] || this.#app?.['config']?.get?.('app.key') || this.#app?.['config']?.['app']?.['key'];
+            const unsigned = this.#cookie.getSignedCookies({ [this.#config['cookie']]: rawSid }, secret);
+            rawSid = unsigned[this.#config['cookie']] || rawSid;
         }
-        const sid: string = this.#getSessionId((cookies || {})[this.#config['cookie']]);
+        const sid: string = this.#getSessionId(rawSid);
         this.#store.read(sid, (err: any, data: any) => {
             Object.defineProperty(request, 'session', {
                 value: new Session(this, data, sid, response),
